@@ -1,6 +1,7 @@
 using API.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -18,6 +19,7 @@ public class Startup
     }
     public void ConfigureServices(IServiceCollection services)
     {
+        services.ConfigureCors();
         services.ConfigureSqlContext(_configuration);
         services.AddControllers();
         services.AddSwaggerGen(c =>
@@ -36,6 +38,12 @@ public class Startup
         }
 
         applicationBuilder.UseHttpsRedirection();
+        applicationBuilder.UseStaticFiles();
+        applicationBuilder.UseCors("CorsPolicy");
+        applicationBuilder.UseForwardedHeaders(new ForwardedHeadersOptions
+        {
+            ForwardedHeaders = ForwardedHeaders.All
+        });
         applicationBuilder.UseRouting();
         applicationBuilder.UseAuthorization();
         applicationBuilder.UseEndpoints(endpoints =>
